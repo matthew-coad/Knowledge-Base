@@ -1,0 +1,59 @@
+---
+title: "Pre-processing - Variable Scaling"
+output: html_document
+---
+
+```{r, include=FALSE}
+
+knitr::opts_chunk$set(fig.width = 16, fig.height = 12)
+options(width = 100)
+
+source("~/MCD/m.R")
+
+print("Loaded")
+```
+
+
+Useful to improve the numeric stability of some calculations,
+
+Main downside is a loss of interpretability of individual values.
+
+## Scale
+
+The scale transform calculates the standard deviation for an attribute and divides each 
+value by that standard deviation. 
+
+Scaling the data coerce the values to have a common standard deviation of one.
+
+This is a useful operation for scaling data with a Gaussian distribution consistently.
+
+```{r}
+m_input_data(iris) %>% m_response(~Species) %>% m_scale_transform() %>% m_variable_statistics() %>% m_query(~ variable_statistics)
+```
+
+## Center Data
+
+The center transform calculates the mean for an attribute and subtracts it from each value.
+
+As a result of centering the predictor has a zero mean.
+
+```{r}
+m_input_data(iris) %>% m_response(~Species) %>% m_center_transform() %>% m_variable_statistics() %>% m_query(~variable_statistics)
+```
+
+## Standardize Data
+
+Combining the scale and center transforms will standardize your data. 
+Attributes will have a mean value of 0 and a standard deviation of 1.
+
+```{r}
+m_input_data(iris) %>% m_response(~Species) %>% m_standardize_transform() %>% m_variable_statistics() %>% m_query(~variable_statistics)
+```
+
+## Normalize Data
+
+Data values can be scaled into the range of [0, 1] which is called normalization.
+
+```{r}
+m_input_data(iris) %>% m_response(~Species) %>% m_range_transform() %>% m_variable_statistics() %>% m_query(~variable_statistics)
+```

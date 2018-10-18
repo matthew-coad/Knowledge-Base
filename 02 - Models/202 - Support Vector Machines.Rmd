@@ -1,0 +1,77 @@
+---
+title: "Models - Support Vector Machines"
+output: html_document
+---
+
+```{r, include=FALSE}
+
+knitr::opts_chunk$set(fig.width = 16, fig.height = 12)
+source("~/MCD/m.R")
+g_prepareCache("~/MCD/Cache")
+
+```
+
+# Computing
+
+## Train
+
+```{r}
+
+library(forcats)
+library(AppliedPredictiveModeling)
+data(solubility)
+
+notFingerprints <- grep("FP", names(solTrainXtrans))
+
+solTrain <- solTrainXtrans
+solTrain$Solubility <- solTrainY
+
+svm_m <-
+    m_task("svm") %>%
+    m_input_data(solTrain) %>%
+    m_response(~Solubility) %>%
+    m_cross_validation() %>%
+    m_seed(100) %>%
+    m_rmse_metric() %>%
+    m_standardize_transform() %>%
+    m_support_vector_machine_radial_basis_kernel(tune_length = 15) %>%
+    m_train() %>%
+    m_model() %>%
+    m_metrics() %>%
+    m_run()
+
+```
+
+### Evaluation
+
+**Training Summary**
+```{r}
+print(svm_m$train)
+```
+
+**Model Summary**
+```{r}
+print(svm_m$model)
+```
+
+**Results**
+```{r}
+svm_m$metrics %>% dplyr::arrange(RMSE)
+```
+
+**Tuning Plot**
+
+```{r}
+m_input_data(svm_m$metrics) %>%
+    m_view_x(~C) %>%
+    m_view_y(~RMSE) %>%
+    m_view_condition(~factor(sigma)) %>%
+    m_linechart() %>%
+    m_layout()
+```
+
+**Diagnostic Plots**
+
+```{r}
+m_diagnostics_plot(svm_m) %>% m_layout()
+```

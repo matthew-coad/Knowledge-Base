@@ -1,0 +1,69 @@
+---
+title: "Problems with Predictive Modelling"
+output: html_document
+---
+
+```{r}
+
+source("~/MCD/m.r")
+
+```
+
+## Why predictive models fail
+
+### Inadequete pre-processing of data
+
+### Inadequete model validation
+
+### Unjustified extrapolation. 
+
+Application of the model to data that reside in a space the model has never seen.
+
+### Over-fitting the model to existing data.
+
+### Incorrect model
+
+Modelers explore relatively few models, due to lack of experience or access to tools.
+
+## Prediction vesus interpretation
+
+Primary interest might be accurate predictions. However complex models are more accurate but are harder to understand.
+
+## Problems with success
+
+### Powerful algorithms
+
+If a predictive signal exists, many modern models will find it. But the best models come from the experience
+of the modeller.
+
+### Proliferation of data
+
+While vast databases can be used for construction predictions, irrelevant information can drive forn predictive 
+performance of many models.
+
+Subject specific knowledge can be used to seperate meaningful information from irrelevant.
+
+Also confounding signals may exist in the data and cannot be identified without expert knowledge.
+
+> In the end, [predictive modeling] is not a substitue for intuition, but rather a complement.
+
+Neither data-drive models, not the expert relying on intuition, will do better than a combination of the two.
+
+Humans usually made better predictions wen they are provided with the results of statistical prediction.
+
+### Problems matters
+
+In Spam detection it may be acceptable to let the computer do the thinking.
+
+In some cases, such are patient response, a combined approach leads to better results.
+
+### Summary
+
+At face value model building seems straightforward. Just run the procedure.
+
+While this approach might generate a predictive model, it will most likely not generate a relible trustworthy model
+for new samples.
+
+To get a reliable model, we must understand the data and the objective of the modeling.
+
+

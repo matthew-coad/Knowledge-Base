@@ -1,0 +1,8 @@
+---
+title: "Models - PLS"
+output: html_document
+---
+
+Benefit from the predictors being on a common scale.
+
+Consider one standard error below best performing model when tuning.

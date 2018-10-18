@@ -1,0 +1,88 @@
+---
+title: "Models - K-Nearest Neighbours"
+output: html_document
+---
+
+# Computing
+
+## Train
+
+```{r}
+
+knitr::opts_chunk$set(fig.width = 16, fig.height = 12)
+
+source("~/MCD/MCD/m.R")
+source("~/MCD/MCD/Predictive Modelling/cluster.R")
+
+library(forcats)
+library(AppliedPredictiveModeling)
+data(solubility)
+
+notFingerprints <- grep("FP", names(solTrainXtrans))
+
+solTrain <- solTrainXtrans
+solTrain$Solubility <- solTrainY
+
+m_sol_base <-
+    m_data(solTrain) %>%
+    m_response("Solubility") %>%
+    m_cross_validation() %>%
+    m_seed(100) %>%
+    m_rmse_metric()
+
+retrain <- FALSE
+state_file <- "~/MCD/MCD/Predictive Modelling/02 - Models/203 - State.RDS"
+
+knn_tune_grid <- expand.grid(.k = 1:20)
+
+if (!file.exists(state_file) || retrain) {
+    knn_m <-
+        m_sol_base %>%
+        m_standardize_transform() %>%
+        m_k_nearest_neighbors(tune_grid = knn_tune_grid) %>%
+        m_train()
+
+    save_state <- list(
+        knn_m = knn_m
+    )
+    saveRDS(save_state, state_file)
+} else
+{
+    save_state <- readRDS(state_file)
+    knn_m <- save_state$knn_m
+}
+
+```
+
+
+### Evaluation
+
+**Training Summary**
+```{r}
+print(m_get_train(knn_m))
+```
+
+**Model Summary**
+```{r}
+print(m_get_final_model(knn_m))
+```
+
+**Results**
+```{r}
+knn_m %>% m_get_results_data() %>% dplyr::arrange(RMSE)
+```
+
+**Tuning Plot**
+
+```{r}
+knn_m %>%
+    m_get_results_data() %>%
+    m_linechart(x = ~k, y = ~RMSE)
+```
+
+**Diagnostic Plots**
+
+```{r}
+m_diagnostics_plot(knn_m)
+```
+

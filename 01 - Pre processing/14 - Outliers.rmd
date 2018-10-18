@@ -1,0 +1,32 @@
+---
+title: "Pre processing - Outliers"
+output: html_document
+---
+
+## Tips
+
++ Samples that are exceptionally far from the mainstream of the dat.
+
++ Their can be formal statistics to define outliers.
+
++ Suspected outliers should are meaningful (E.g. positive blood pressure)
+
++ Check that data recording errors haven't occurred.
+
++ Care should be taken not to remove them, especially if the sample size is small.
+
++ When sample size is small, apparent outliers might be the result of skewed distributions
+where their is not enough data to see skewness.
+
++ With certain data collection methods, a "cluster" of points outside mainstream might belong
+to a different population than the other samples.
+
++ Some predictive models are resistent to outliers.
+
+## Transformations to resolve outliers
+
+If a model is considered sensitive to outliers, spatial sign transform can minimize problem.
+
+It is important to standardize data prior to spatial sign.
+
+Spatial sign transforms variables as a group. Removing predictors after spatial sign can be problematic.

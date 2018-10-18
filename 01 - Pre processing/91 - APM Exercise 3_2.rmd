@@ -1,0 +1,60 @@
+---
+title: "Pre Processing - APM Exercise 3.2"
+output: html_document
+---
+
+
+```{R Load}
+
+knitr::opts_chunk$set(fig.width = 16, fig.height = 12)
+
+source("~/MCD/MCD/m.R")
+
+library(mlbench)
+data(Soybean)
+
+m <- m_input_data(Soybean) %>% m_pre_process() %>% m_variable_exploration() %>% m_run()
+
+```
+
+## Exploration
+
+**a) Investigate the frequency distributions for categorical predictors.**
+
+```{R block1}
+m$variable_exploration %>% dplyr::select(variable, type, nas, nearZeroVar, highCor) %>% print(n = Inf)
+```
+
+**Are any of the distributions degenerate?**
+
+leaf.mild and mycelim have near zero variance distributions.
+Because they are all categorical correlation is irrelevent.
+
+**Are their any particular predictors that are more likely to be missing?**
+
+hail, sever, seed.tmt, germ, lodging are most likely to be missing.
+
+**Is the pattern of missing data related to the classes?**
+
+```{R Missing}
+missing_stats <-
+    as_tibble(Soybean) %>%
+    gather(variable, value, - Class) %>%
+    mutate(Missing = factor(if_else(!is.na(value), "Present", "Missing"))) %>%
+    group_by(Class, variable, Missing) %>%
+    summarise(Count = n())
+ggplot(missing_stats, aes(x = variable, y = Count, fill = Missing)) + geom_bar(stat = "identity", position = "fill") + facet_wrap(~Class) + coord_flip()
+```
+Yes. Missing data is related to specific classes. In many cases the data is completely
+missing for some variables.
+
+**Develop a strategy for dealing with the missing data**
+
+Dropping variables seem infeasible because most are missing for some classes.
+
++ Imputation, try all the out-of-the-box methods.
+
+Try creating a "missing" class for everything and see how that works.
+
+Plan to use a tree method.
+

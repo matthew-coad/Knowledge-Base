@@ -1,0 +1,140 @@
+---
+title: "Pre processing - APM Exercise 3.1"
+output: html_document
+---
+
+## Load
+
+```{R, include = FALSE}
+
+source("~/MCD/m.R")
+
+library(mlbench)
+data(Glass)
+
+m <- m_input_data(Glass) %>% m_pre_processed_data() %>% m_variables() %>% m_run()
+
+```
+
+## Exploration
+
+a) Using visualizations explore the predictor variables to understand their
+distributions as well as the relationships between predictors.
+
+**Histograms**
+
+```{R Histogram}
+
+m %>% m_histogram() %>% m_layout()
+
+```
+
+**Density**
+
+```{R Density}
+
+m %>% m_density() %>% m_layout()
+
+```
+
+**RI Explore**
+
+```{R}
+
+m %>% m_view_y(~RI) %>% m_scatter() %>% m_layout()
+
+```
+
+**Na Explore**
+
+```{R}
+
+m %>% m_view_y(~Na) %>% m_scatter() %>% m_layout()
+
+```
+
+**MG Explore**
+
+```{R}
+
+m %>% m_view_y(~Mg) %>% m_scatter() %>% m_layout()
+
+```
+
+**Al Explore**
+
+```{R}
+
+m %>% m_view_y(~Al) %>% m_scatter() %>% m_layout()
+
+```
+
+**Si Explore**
+
+```{R}
+
+m %>% m_view_y(~Si) %>% m_scatter() %>% m_layout()
+
+```
+
+**K Explore**
+
+```{R}
+
+m %>% m_view_y(~K) %>% m_scatter() %>% m_layout()
+
+```
+
+**Ca Explore**
+
+```{R}
+
+m %>% m_view_y(~Ca) %>% m_scatter() %>% m_layout()
+
+```
+
+**Ba Explore**
+
+```{R}
+
+m %>% m_view_y(~Ba) %>% m_scatter() %>% m_layout()
+
+```
+
+**Fe Explore**
+
+```{R}
+
+m %>% m_view_y(~Fe) %>% m_scatter() %>% m_layout()
+
+```
+
+## Analysis
+
+**b) Do there appear to be any outliers in the data.**
+
+A few.
+
++ An overmeasurement of Na.
+
++ A distinct overmeasurement in K.
+
++ A distinct overmeasurement in Fe.
+
++ Some possible overmeasurements in Ba. But their is a trend and could be part
+of an undersampled population.
+
++ Mg, Ba and Fe appear to have missing values encoded as 0.
+
+**Are any of the predictors skewed?**
+
+K, Ca. Ideally drop the missing values to get a better look.
+
+## Conclusions
+
+c) Are there any relevant data transformations of one or more predictors that might
+improve the classication model.
+
++ Replace missing values with Na.
++ Impute missing values with Knn.
++ BoxCox transform.

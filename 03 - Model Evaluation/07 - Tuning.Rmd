@@ -1,0 +1,63 @@
+---
+title: "Model Evaluation - Tuning"
+output: html_document
+---
+
+# Notes
+
++ Many models have important parameters which cannot be directly estimated from the data.
+
++ Poor choices for these parameters can result in over-fitting.
+
+## Approaches for tuning
+
+A general approach is to define a set of candiate values, generate reliable estimates of 
+model utility across the candidate values, then choose the optimal settings.
+
+Another approach is genetic algorithms. (APM - Mitchel 1998)
+
+Another approach is simplex search methods. (APM - Olsson and Nelson 1975)
+
+# Computation
+
+Taken from APM Chapter 4. Load data.
+
+```{r}
+
+source("~/MCD/MCD/m.R")
+
+library(caret)
+data(GermanCredit)
+
+GermanCredit <- GermanCredit[, - caret::nearZeroVar(GermanCredit)]
+GermanCredit$CheckingAccountStatus.lt.0 <- NULL
+GermanCredit$SavingsAccountBonds.lt.100 <- NULL
+GermanCredit$EmploymentDuration.lt.1 <- NULL
+GermanCredit$EmploymentDuration.Unemployed <- NULL
+GermanCredit$Personal.Male.Married.Widowed <- NULL
+GermanCredit$Property.Unknown <- NULL
+GermanCredit$Housing.ForFree <- NULL
+
+gc_p <- m_data(GermanCredit) %>% m_response("Class") %>% m_stratified_split(p = 0.8) %>% m_seed(1056)
+
+print("Data Loaded")
+
+```
+
+## Tune length
+
+Set the tune length. A set of tuing parameters was automatically selected.
+
+```{r}
+
+gc_tune_m <- gc_p %>%
+    m_accuracy_metric() %>%
+    m_standardize_transform() %>%
+    m_cross_validation() %>%
+    m_support_vector_machine_radial_basis(tune_length = 10) %>%
+    m_train()
+
+gc_tune_m %>% m_get_results_data() %>% m_linechart(x = ~C, y = ~Accuracy, sd = ~AccuracySD, plot = ~base_plot + scale_x_log10())
+
+
+```

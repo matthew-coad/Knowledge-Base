@@ -1,0 +1,88 @@
+---
+title: "Model Evaluation - Regression Performance"
+output: html_document
+---
+
+Visualizations of the model fit are critical to understanding if the model is fit for purpose.
+
+The residual plot is particular useful.
+
+# RMSE
+
+When an outcome is a number, the most common method for characterizing the predictive capability is the
+root mean squared error.
+
+The RMSE is interpreted as how far the residuals are from zero, or as the average distance between the observed 
+and predicted values.
+
+# RSquared
+
+Another common metric is the coefficent of determination. Commonly written as R^2.
+
+The value can be interpreted as the proportion of the information in the data that is explained by the model.
+
+This an Rsquared of 0.75 implies that the model can explain three-quarters of the variation in the outcome.
+
+While its an easily interpreted stat, the practioner must remember that R2 is a measure of correlation, not accuracy.
+And thus can be misleading where their is a non-linear relationship between outcome and prediction.
+
+Also the metric is dependant on the variation in the outcome. Test sets with low variation will have a lower Rsquared.
+
+# Rank Correlation
+
+In some cases the goal of the model is to simply rank new samples.
+
+E.G. as a part of screening studies.
+
+In this case the metric is the correlation between the rank of the outcomes vs. the ranks of the predicted values.
+
+This metric is commonly known as the Spearmans rank correltation.
+
+# Computing
+
+```{r}
+source("~/MCD/MCD/m.R")
+
+library(mlbench)
+data(PimaIndiansDiabetes)
+data(longley)
+
+m_longley <-
+    m_input_data(longley) %>%
+    m_response(~Employed) %>%
+    m_linear_regression() %>%
+    m_cross_validation(number = 5) %>%
+    m_rmse_metric() %>%
+    m_train() %>%
+    m_results() %>%
+    m_rank_correlation() %>%
+    m_run()
+
+print("Evaluated")
+
+```
+
+
+## Diagnostics plot
+
+```{r}
+m_longley %>% m_diagnostics_plot() %>% m_run() %>% m_layout()
+
+```
+
+## Metrics
+
+```{r}
+m_longley$results
+```
+
+**Rank Correlation**
+
+```{r}
+
+m_longley$rank_correlation
+
+```
+
+
+

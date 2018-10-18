@@ -1,0 +1,104 @@
+---
+title: "Pre processing - Data reduction"
+output: html_document
+---
+
+```{r, include=FALSE}
+source("~/MCD/m.R")
+
+library(mlbench)
+data(PimaIndiansDiabetes)
+
+print("Loaded")
+```
+
+## Tips
+
++ Seek to reduce the data by generating a smaller set of predictors that seek to
+capture the majority of the information in the original variables.
+
++ Original predictors are needed to create surrogate variables.
+
++ Also known as feature extraction.
+
+
+## Principal Component Analysis Transform
+
+The PCA transforms the data to return only the principal components, a technique from multivariate 
+statistics and linear algebra. 
+
++ Seeks to fund a linear combinations of the predictors. 
+
++ First PC is the linear combination that captures most variance. Then subsequent capture remaining variance.
+
++ The transform keeps those components above the variance threshold  (default=0.95) or the number of components can be speciﬁed (pcaComp). 
+
++ Results in attributes that are uncorrelated.
+
++ Useful for algorithms like linear and generalized linear regression.
+
++ Removes redundant information from multiple predictors.
+
++ Helps with numeric stability.
+
++ Use to extract information from a specific set of predictors?
+
++ Combination coefficients can help to understand which predictors are important to each PC.
+
++ Does not regard further understanding of the predictors. (ie measurement scale or distributions) or
+modelling objectives.
+
++ Can summarize information not relevant to modelling objectives.
+
++ Naturally drawn to predictors that are in higher orders of magnitude.
+
++ Consider center and scaling, transform skew first.
+
++ If predictive relationship is not connect to predictors variability, then the PCs will not have
+a suitable relationship to the response. Supervised technique like PLS derive components while considering the response.
+
+### Example
+
+```{r}
+pca_m <- m_input_data(iris) %>% m_standardize_transform() %>% m_pca_transform() %>% m_pre_processed_data() %>% m_variable_statistics()
+pca_m %>% m_query(~ variable_statistics)
+pca_m %>% m_density() %>% m_layout()
+```
+
+### Evaluation of PCs
+
++ IF large number of predictors need to decide on number of components to retain.
+
++ Use a scree plot of ordered component number vs summarized variablity. Retain number just prior to tapering off.
+
+### Exploration
+
+Visually examing principal compoents is a critical step for assessing data quality and 
+gaining intuition of the problem.
+
+The first few principals components can be plotted against each other and symbols colored by 
+characteristics,
+
+IF PCA can demonstate clusters of samples or outliers that may prompt a closer examination.
+
+For classification problems PCA can demonstate seperation of classes, or lack thereof. If their
+is little clustering, the plot of PC values will significant overlap.
+
+Take note of the scale when plotting components. Scale tends to get smaller for later components. Note
+amount of variation explained by each component.
+
+Another explatory use of PCA is charactrizing which predictors are associated with each component.
+
+If data plotted on seperate scales, their is a tendancy to overinterpret.
+
+## Independent Component Analysis Transform
+
+Transform the data to the independent components. Unlike PCA, ICA retains those components 
+that are independent. You must specify the number of desired independent components with 
+the n.comp argument. This transform may be useful for algorithms such as Naive Bayes.
+
+```{r}
+ica_m <- m_input_data(PimaIndiansDiabetes[, 1:8]) %>% m_standardize_transform() %>% m_ica_transform(n.comp = 5) %>% m_pre_processed_data() %>% m_variable_statistics() %>% m_run()
+ica_m %>% m_query(~ variable_statistics)
+ica_m %>% m_density() %>% m_layout()
+```

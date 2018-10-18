@@ -1,0 +1,84 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+The anscombe datasets shows 4 datasets with exactly the same mean and SD but same correlation statistic but widely different
+intuitive correlations.
+
+## Load
+
+```{r}
+
+source("~/MCD/Library/V.R")
+
+df_raw <- datasets::anscombe
+
+## Tidy
+df1 <- df_raw %>% mutate(group = "1") %>% select(x = x1, y = y1, group)
+df2 <- df_raw %>% mutate(group = "2") %>% select(x = x2, y = y2, group)
+df3 <- df_raw %>% mutate(group = "3") %>% select(x = x3, y = y3, group)
+df4 <- df_raw %>% mutate(group = "4") %>% select(x = x4, y = y4, group)
+
+df <- bind_rows(df1, df2, df3, df4)
+
+print("Data loaded")
+
+```
+
+### Df1
+
+```{r, echo=FALSE}
+
+v_describe(df1)
+
+```
+
+```{r, echo=FALSE}
+
+v_explore(df1$x, df1$y)
+
+```
+
+### Df2
+
+```{r, echo=FALSE}
+
+v_describe(df2)
+
+```
+
+```{r, echo=FALSE}
+
+v_explore(df2$x, df2$y)
+
+```
+
+### Df3
+
+```{r, echo=FALSE}
+
+v_describe(df3)
+
+```
+
+```{r, echo=FALSE}
+
+v_explore(df3$x, df3$y)
+
+```
+
+### Df4
+
+```{r, echo=FALSE}
+
+v_describe(df4)
+
+```
+
+
+```{r, echo=FALSE}
+
+v_explore(df4$x, df4$y)
+
+```

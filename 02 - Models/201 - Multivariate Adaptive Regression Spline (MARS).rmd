@@ -1,0 +1,102 @@
+---
+title: "Models - Multivariate Adaptive Regression Spline (MARS)"
+output: html_document
+---
+
+# Computing
+
+## Preparation
+
+```{r, include=FALSE}
+
+source("~/MCD/m.R")
+
+library(forcats)
+library(AppliedPredictiveModeling)
+library(earth)
+data(solubility)
+
+g_startCluster()
+
+notFingerprints <- grep("FP", names(solTrainXtrans))
+
+solTrain <- solTrainXtrans
+solTrain$Solubility <- solTrainY
+
+m_sol_base <-
+    m_input_data(solTrain) %>%
+    m_response(~Solubility) %>%
+    m_cross_validation() %>%
+    m_seed(100) %>%
+    m_rmse_metric() %>%
+    m_run()
+
+```
+
+### Train
+
+```{r}
+
+mars_grid <- expand.grid(.degree = 1:2, .nprune = 2:38)
+mars_m <- m_sol_base %>%
+    m_multivariate_adaptive_regression_spline(tune_grid = mars_grid) %>%
+    m_train() %>%
+    m_results() %>%
+    m_model() %>%
+    m_run(TRUE)
+
+```
+
+### Evaluation
+
+**Training Summary**
+```{r}
+print(mars_m$train)
+```
+
+**Model Summary**
+```{r}
+summary(mars_m$model)
+```
+
+**Results**
+```{r}
+mars_m$results %>% dplyr::arrange(RMSE)
+```
+
+**Tuning Plot**
+
+```{r}
+m_input_data(mars_m$results) %>%
+    m_view_x(~nprune) %>%
+    m_view_y(~RMSE) %>%
+    m_view_condition(~factor(degree)) %>%
+    m_linechart() %>%
+    m_layout()
+```
+
+**Diagnostic Plots**
+
+```{r}
+mars_m %>% m_diagnostics_plot() %>% m_layout()
+```
+
+**Variable Importance**
+
+```{r}
+mars_m %>%
+    m_variable_importance() %>%
+    m_query(~ variable_importance) %>%
+    filter(overall > 0) %>%
+    m_input_data() %>%
+    m_view_x(~fct_reorder(variable, overall)) %>%
+    m_view_y(~overall) %>%
+    m_barchart() %>%
+    m_layout()
+```
+
+## Clean up
+
+```{r}
+g_stopCluster()
+```

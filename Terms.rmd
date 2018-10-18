@@ -1,0 +1,49 @@
+---
+title: "Terms"
+output: html_document
+---
+
+## General
+
++ Data point, observation, instance - A single independant unit of data.
++ Sample - A subset of data points.
++ Training set - Data used to develop models.
++ Test set, validation set - Data used to evaludate candidate models.
++ Predictors, independant variables, attributes, descriptors - Data used as prediction input.
++ Continuous - Data with natural, numeric scales.
++ Categorical, norminal, attribute, discreate - Data that takes on specific values.
++ Model building, model training, parameter estimation - process of using data to determine values of model equations.
+
+## Response characteristics
+
++ Categorical
++ Continuous
++ Balanced
++ Symmetric
++ Unbalanced
++ Skewed
++ Independant
+
+## Predictor characteristics
+
++ Continuous
++ Count
++ Categorical
++ Correlated, associated
++ Different scales
++ Missing values
++ Sparse
+
+## Data Processing
+
++ Feature Extraction - Creating surrogate variables that are combinations of predictors.
+
++ Feature Engineering - Changing how predictors are encoded
+
+## Evaluation
+
++ Apparent performance - Performance of the model when tested on the training data.
+
+## Numeric Terms
+
+Numeric stability

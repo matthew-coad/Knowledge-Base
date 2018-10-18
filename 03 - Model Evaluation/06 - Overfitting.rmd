@@ -1,0 +1,27 @@
+---
+title: "Model Evaluation - Over fitting"
+output: html_document
+---
+
+Many modern models are highly adapable. They can model complex relationships. 
+However they can easily overemphasize patterns that are not reproducible.
+
+Without a way to evaluate models, the modeller will not know about the problem until the
+next set of samples is predicted. Their are strategies that allow us to have confidence
+that a model will predict new samples with the same degree of accuracy as the training set. 
+Without this confidence, the models predictions are useless.
+
+All model building efforts are constrained by the data at hand. We have no choice but to use the
+data we have.
+
+Almost all predictive models have tuning parameters that enable the model to flex to find the 
+structure in the data. We must use the existing data to identify settings for the model
+parameters.
+
+Modern techniques split the data into multiple training and testing sets, which have been shown
+to often find more optimal tuning parameters and give a more accurate representation of the 
+models predictive performance.
+
+Ultimate goal of model building is trying to find the *reproducible* structure in the data.
+
+Overfitting is when the model has learned the characteristics of a samples unique noise.

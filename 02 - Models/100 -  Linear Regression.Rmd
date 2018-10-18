@@ -1,0 +1,182 @@
+---
+title: "Models - Linear Regression"
+output: html_document
+---
+
+# Tips
+
++ Can all be written as a linear equation.
+
++ Family includes Linear Regression, Partial Least Squares, Penalized models including ridge, lasso and elastic net.
+
++ Linear regression finds parameters that have minimum bias.
+
++ These models are highly interpretable.
+
++ But their linear nature makes them limited in their usefullness.
+
++ Their mathematical nature allows us to compute standard errors of the coefficients.
+
++ IF their is a curviliear relationship then the functions of the predictors
+(E.G Log, Square, Sqrt etc) can be used to try and capture that relationship.
+
+# Computing
+
+**Load data**
+
+```{r}
+
+source("~/MCD/m.R")
+
+library(AppliedPredictiveModeling)
+data(solubility)
+
+notFingerprints <- grep("FP", names(solTrainXtrans))
+
+solTrain <- solTrainXtrans
+solTrain$Solubility <- solTrainY
+
+m_sol_base <-
+    m_input_data(solTrain) %>%
+    m_response(~Solubility) %>%
+    m_cross_validation() %>%
+    m_seed(100) %>%
+    m_rmse_metric() %>%
+    m_run()
+
+print("Loaded")
+
+```
+
+
+## Linear Regression
+
+### Train
+
+```{r}
+
+m_sol_lm <-
+    m_sol_base %>%
+    m_cross(
+        "algor",
+        "lm" = ~ m %>% m_linear_regression(),
+        "lmst" = ~ m %>% m_standardize_transform() %>% m_linear_regression(),
+        "drop9" = ~ m %>% m_drop_correlated_variables(0.9) %>% m_linear_regression(),
+        "robust" = ~ m %>% m_standardize_transform() %>% m_pca_transform() %>% m_robust_linear_regression()
+    ) %>%
+    m_train() %>%
+    m_metrics() %>%
+    m_run()
+
+print("LM Trained")
+```
+
+### Evaluate
+
+```{r}
+m_query(m_sol_lm, ~ results)
+```
+
+### Diagnostic plots
+
+```{r}
+m_sol_lm %>% m_title(~ name) %>% m_diagnostics_plot() %>% m_layout()
+```
+
+## Partial Least Squares
+
+```{r}
+
+m_sol_pls <-
+    m_sol_base %>%
+    m_cross(
+        "algor",
+        "pls" = ~ m %>% m_partial_least_squares(tune_grid = expand.grid(ncomp = 1:20)),
+        "pcr" = ~ m %>% m_principal_component_regression(tune_grid = expand.grid(ncomp = 1:35))
+    ) %>%
+    m_train() %>%
+    m_metrics() %>%
+    m_run()
+
+print("PLS Trained")
+```
+
+### Evaluate
+
+```{r}
+m_query(m_sol_pls, ~metrics)
+```
+
+### Metric by components
+
+```{r}
+m_sol_pls %>% m_combine(data = ~metrics) %>% m_view_x(~ncomp) %>% m_y(~RMSE) %>% m_condition(~.task) %>% m_linechart() %>% m_layout()
+```
+
+### Diagnostic plots
+
+```{r}
+m_sol_pls %>% m_title(~ name) %>% m_diagnostics_plot() %>% m_layout()
+```
+
+## Penalized Models
+
+```{r}
+
+ridgeGrid <- expand.grid(lambda = seq(0, .1, length = 15))
+enetGrid <- expand.grid(lambda = c(0, 0.01, .1), fraction = seq(.05, 1, length = 20))
+
+m_sol_pen <-
+    m_sol_base %>%
+    m_cross(
+        "algor",
+        "ridge" = ~m %>% m_standardize_transform() %>% m_ridge_regression(tune_grid = ridgeGrid),
+        "enet" = ~m %>% m_standardize_transform() %>% m_elastic_net(tune_grid = enetGrid)
+    ) %>%
+    m_train() %>%
+    m_metrics() %>%
+    m_augmented_data() %>%
+    m_run()
+
+print("Penalized Models Trained")
+```
+
+### Evaluate
+
+```{r}
+m_sol_pen_results <- m_sol_pen %>% m_combine(metrics = ~metrics)
+m_sol_pen_results$metrics
+```
+
+### Metric by components
+
+**ridge**
+
+```{r}
+m_sol_pen_results %>%
+    m_data(~results %>% dplyr::filter(.task == "ridge")) %>%
+    m_view_x(~lambda) %>%
+    m_view_y(~RMSE) %>%
+    m_linechart() %>%
+    m_layout()
+```
+
+**enet**
+
+```{r}
+m_sol_pen_results %>%
+    m_data(~results %>% dplyr::filter(.task == "enet")) %>%
+    m_view_x(~fraction) %>%
+    m_view_y(~RMSE) %>%
+    m_view_condition(~factor(lambda)) %>%
+    m_linechart() %>%
+    m_layout()
+```
+
+### Diagnostic plots
+
+```{r}
+m_sol_pen$enet %>%
+    m_diagnostics_plot() %>%
+    m_layout()
+```

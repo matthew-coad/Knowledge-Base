@@ -1,0 +1,47 @@
+---
+title: "Pre processing - Dummy Variables"
+output: html_document
+---
+
+```{r, include=FALSE}
+
+source("~/MCD/m.r")
+
+print("Loaded")
+
+```
+
+## Tips
+
++ Formula method permits great flexibility when creating dummy variables.
+
++ Splits in a tree-based model are more interpretable when the dummy variables encode all the information
+for the predictor.
+
+## Demonstration
+
+Create dummy variables using iris
+
+```{r dummy_vars}
+
+iris_m1 <-
+    m_input_data(iris) %>%
+    m_dummy_variables() %>%
+    m_pre_processed_data() %>%
+    m_variable_statistics() %>%
+    m_run()
+iris_m1$variable_statistics
+```
+
+Create an interaction term. And adding a response takes it out of consideration.
+
+```{r interaction}
+iris_m2 <-
+    m_input_data(iris) %>%
+    m_response(~Species) %>%
+    m_dummy_variables(~. + Sepal.Width:Sepal.Length) %>%
+    m_pre_processed_data() %>%
+    m_variable_statistics() %>%
+    m_run()
+iris_m2$variable_statistics
+```

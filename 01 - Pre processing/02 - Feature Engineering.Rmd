@@ -1,0 +1,34 @@
+---
+title: "Pre-processing - Feature Engineering"
+output: html_document
+---
+
++ Can have a significant impact on model performance.
+
++ Using combinations of perdictors can be more effective than individual values.
+
++ Most effective when encoding is informed by the modellers understanding of the problem as 
+opposed to dervived by a mathematical technique.
+
++ Some encodings will work better for some models.
+
++ In some models multiple encodings of the same data cause problems.
+
++ Relationship between predictor and outcome is important.
+
+## Techniques
+
+### Ratios
+
+Using the ratio of two predictors may work better.
+
+### Dates
+
++ The number of days since a reference date.
++ Isolating the month, year and day of week.
++ The numeric data of the year.
++ Whether the date was within a school year vs. holiday, summer sessions.
++ A seasonal component might be best modelled by day of year or month of year.
+
+
+

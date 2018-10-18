@@ -1,0 +1,28 @@
+﻿---
+title: "Evaluation - Overview"
+output: html_document
+---
+
+When you are building a predictive model, you need to evaluate the capability of the model on unseen data. This is typically 
+done by estimating accuracy using data that was not used to train the model. The caret package in R provides a number of 
+methods to estimate the accuracy of a machine learning algorithm. 
+
+1 - How to split a dataset into train and test subsets.  
+2 - How to evaluate model accuracy using the bootstrap method.  
+3 - How to evaluate model accuracy using k-fold cross-validation with and without repeats.  
+4 - How to evaluate model accuracy using leave one out cross-validation.  
+
+## 10.1 Estimating Model Accuracy
+
+When working on a project you often only have a limited set of data and you need to choose carefully how you use it. 
+Predictive models require data on which to train. You also need a dataset that the model has not seen during training 
+on which it can make predictions. The accuracy of the model predictions on data unseen during training can be used as 
+an estimate for the accuracy of the model on unseen data in general. You cannot estimate the accuracy of the model on 
+the data used to train it. An ideal model could just remember all of the training instances and make perfect predictions. 
+
+You must hold data aside primarily for the purposes of model evaluation. There are methods that you can use if you have a 
+lot of data and do not need to be careful about how it is spent during training. More commonly your dataset has a ﬁxed size 
+and you need to use statistical techniques that make good use of a limited size dataset. These statistical methods are 
+often called resampling methods as they take multiple samples or make multiple splits of your dataset into portions 
+that you can use for model training and model testing. 
+

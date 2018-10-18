@@ -1,0 +1,67 @@
+---
+title: "Pre-processing - Resolve Skewness"
+output: html_document
+---
+
+```{r, include = FALSE}
+
+knitr::opts_chunk$set(fig.width = 16, fig.height = 12)
+options(width = 100)
+
+source("~/MCD/m.R")
+
+library(mlbench)
+data(PimaIndiansDiabetes)
+
+print("Loaded")
+```
+
+## Tips
+
++ Right-skewed distribution has a large number of data points on the left-side of the distribution. Or another way, there 
+is a greater number of data points at relatively small values.
+
++ Data whose ratio of the highest to lower greater than 20 has significant skew.
+
++ Skewness statistic can be a diagnostic. Zero is symmetric, greater zero is right-skewed, less-zero is left-skewed.
+
++ Replacing the data with log, square-root or inverse may help to remove skew.
+
+## Skewed Statistics
+
+When an attribute has a Gaussian-like distribution but is shifted, this is called a skew. 
+
+```{r Base}
+
+# summarize pedigree and age
+m_input_data(PimaIndiansDiabetes[, 7:8]) %>% m_variable_statistics() %>% m_query(~ variable_statistics)
+
+m_density(PimaIndiansDiabetes[, 7:8]) %>% m_layout()
+
+```
+
+## Box-Cox Transform
+
+The distribution of an attribute can be shifted to reduce the skew and make it more 
+Gaussian. The BoxCox transform can perform this operation (assumes all values are positive).
+
+
+```{r}
+
+boxcox_m <- m_input_data(PimaIndiansDiabetes[, 7:8]) %>% m_boxcox_transform() %>% m_pre_processed_data() %>% m_variable_statistics() %>% m_run()
+boxcox_m$variable_statistics
+boxcox_m %>% m_density() %>% m_layout()
+
+```
+
+## 9.8 Yeo-Johnson Transform
+
+The YeoJohnson transform another power-transform like Box-Cox, but it supports raw values that are 
+equal to zero and negative.
+
+```{r}
+yeo_m <- m_input_data(PimaIndiansDiabetes[, 7:8]) %>% m_yeojohnson_transform() %>% m_pre_processed_data() %>% m_variable_statistics() %>% m_run()
+yeo_m$variable_statistics
+yeo_m %>% m_density() %>% m_layout()
+
+```

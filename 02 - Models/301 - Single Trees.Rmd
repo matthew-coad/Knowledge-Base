@@ -1,0 +1,93 @@
+---
+title: "Models - Single Trees"
+output: html_document
+---
+
+# Computing
+
+## Train
+
+```{r}
+
+knitr::opts_chunk$set(fig.width = 16, fig.height = 12)
+
+source("~/MCD/MCD/m.R")
+source("~/MCD/MCD/Predictive Modelling/cluster.R")
+
+library(forcats)
+library(AppliedPredictiveModeling)
+library(partykit)
+data(solubility)
+
+notFingerprints <- grep("FP", names(solTrainXtrans))
+
+solTrain <- solTrainXtrans
+solTrain$Solubility <- solTrainY
+
+m_sol_base <-
+    m_input_data(solTrain) %>%
+    m_response(~ Solubility) %>%
+    m_cross_validation() %>%
+    m_seed(100) %>%
+    m_rmse_metric()
+
+retrain <- FALSE
+state_file <- "~/MCD/MCD/Predictive Modelling/02 - Models/301 - State.RDS"
+
+if (!file.exists(state_file) || retrain) {
+    rpart_m <-
+        m_sol_base %>%
+        m_classification_and_regression_trees(tune_length = 10) %>%
+        m_train() %>%
+        m_run()
+
+    save_state <- list(
+        rpart_m = rpart_m
+    )
+    saveRDS(save_state, state_file)
+} else
+{
+    save_state <- readRDS(state_file)
+    rpart_m <- save_state$rpart_m
+}
+
+```
+
+### Evaluation
+
+**Training Summary**
+```{r}
+print(m_get_train(rpart_m))
+```
+
+**Model Summary**
+```{r}
+m_get_final_model(rpart_m)
+```
+
+**Results**
+```{r}
+rpart_m %>% m_get_results_data() %>% dplyr::arrange(RMSE)
+```
+
+**Tuning Plot**
+
+```{r}
+rpart_m %>%
+    m_get_results_data() %>%
+    m_linechart(x = ~cp, y = ~RMSE)
+```
+
+**Diagnostic Plots**
+
+```{r}
+m_diagnostics_plot(rpart_m)
+```
+
+**Tree Plots**
+
+```{r}
+rpart_m %>% m_get_final_model() %>% as.party() %>% plot()
+```
+
+

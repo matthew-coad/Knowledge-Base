@@ -1,0 +1,103 @@
+---
+title: "09 - Classification Performance"
+author: "Matthew Coad"
+date: "15 August 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**More Summary work needed. ROC Curves. Lift Charts.**
+
+Classification models produce two types of prediction.
+
+They produce a continuous valued prediction, which is normally in the form of a probability.
+
+In addition they produce a predicted class.
+
+For most practical applications a discrete class is required.
+
+Even if the discrete class is required, the probabilities are still useful for gauging the models confidence in the predicted class.
+
+In some cases the probabilities are desired. Such as when calculating the costs of interventions.
+
+Some predictive models produce continuous predictions that are not probability like. IE neural networks, partial least squares.
+
+In these cases a transformation is required to coerce the value to a probability. For example the softmax transformation.
+
+
+## Well Calibrated probabilities
+
+We desire the estimates of probabilties to reflect the true underlying probability. That is well calibrated.
+
+To be well-calibrated the probabilties must effectively reflect the true likehood of the event of interest.
+
+We can use calibrastion plots to assess the quality of the prediction.
+
+Class probabilites can be calibrated to more closely reflect the likehood of the event. See APM.
+
+## Presenting class probabilties
+
+For two classes, histograms of the predicted classes for each of the true outcomes illustate the strength and weaknesses or each model.                                             
+
+Where their are multiple classes a heat map can be used to guage confidence in the classes See APM.
+
+## Equivocal Zones
+
+To improve classification performance we can create equivocal zones where the class is not predicted where the confidence to not high.
+
+
+## Evaluating predicted classes
+
+A common method for describing the performance of a classification model is the confusion matrix.
+
+The simplest metric is the overall accuracy.
+
+However this metric makes no distinction about the type of errors occurred. In cases were the costs associated with different types of error this metric might not be adequete.
+
+Also one must consider the natural frequencies of each class.
+
+In cases where the event of interest occurs very rarely than a model that predicts all negative will give a high accuracy.
+
+The Kappa statistic takes into account the class distribution. The statistic takes on a distribution from -1 to 1. Zero means no agreement, 1 means perfect agreement, -1 means perfect disagreement but negative values are rare.
+
+When class distributions are equivalent, overall accuracy  and Kappa are proportional. Typically Kappa values within 0.30 and 0.50 indicate reasonable agreement.
+
+Where there is a natural ordering in problems with more than one class (IE low, medium, high) weighted Kappa can be used to extract more significant penalties on errors that are further away from the true results.
+
+## Two Class Problems
+
+For two classes where one class is considered the event of interest their are additional statistics that may be considered relevant.
+
+The sensitivity is the rate that the event of interest is predicted correctly for all samples having the event. Also known
+as the true positive rate.
+
+The specificity is the rate that nonevents are predicted as nonevents.
+
+Their is a tradeoff between sensitivity and specificity. The trade-offs may be appropiate to consider where there are different penalties assoicated with the type of error.
+
+For instance, specificity is the focus when the cost for missing the event of interest is low.
+
+The receiver operating characteric curve (ROC) is a technique for evaluating this tradeoff.
+
+However, given a prediction, people are typically interested in unconditional queries. What is the chance of the event of interest. These metrics take into account the prevalence of the event of interest.
+
+The analog of sensitivity is the positive predicted value.
+
+The analog of specificty is the negative predicted value.
+
+However prevalence is rarely used to characterise a model.
+
+## Unbalanced Classes
+
+In a two class problem having one class with a frequency of less than 15% can be considered unbalanced
+
+
+
+
+
+
+
+

@@ -1,0 +1,67 @@
+﻿---
+title: "Model Evaluation - Metrics"
+output: html_document
+---
+
+```{r}
+source("~/MCD/MCD/m.R")
+
+library(mlbench)
+data(PimaIndiansDiabetes)
+data(longley)
+
+print("Loaded")
+```
+
+There are many diﬀerent metrics that you can use to evaluate your machine learning algorithms in R. 
+When you use caret to evaluate your models, the default metrics used are accuracy for classiﬁcation 
+problems and RMSE for regression. But caret supports a range of other popular evaluation metrics. 
+
+## Accuracy and Kappa
+
+Accuracy and Kappa are the default metrics used to evaluate algorithms on binary and multiclass 
+classiﬁcation datasets in caret. Accuracy is the percentage of correctly classiﬁed instances 
+out of all instances. It is more useful on a binary classiﬁcation than multiclass classiﬁcation problem
+because it can be less clear exactly how the accuracy breaks down across those classes (e.g. you need 
+to go deeper with a confusion matrix). 
+
+Kappa or Cohen’s Kappa is like classiﬁcation accuracy, except that it is normalized at the baseline 
+of random chance on your dataset. It is a more useful measure to use on problems that have an 
+imbalance in the classes (e.g. a 70% to 30% split for classes 0 and 1 and you can achieve 
+70% accuracy by predicting all instances are for class 0). In the example below the Pima 
+Indians diabetes dataset is used. It has a class break down of 65% to 35% for negative and 
+positive outcomes.
+
+```{r}
+
+m <- m_input_data(PimaIndiansDiabetes) %>% m_response(~ diabetes) %>% m_generalized_linear_regression() %>% m_cross_validation(number = 5) %>% m_accuracy_metric() %>% m_train() %>% m_run()
+print(m$train)
+
+```
+
+## RMSE and R-squared
+
+RMSE and R2 are the default metrics used to evaluate algorithms on regression datasets in caret. RMSE 
+or Root Mean Squared Error is the average deviation of the predictions from the observations. 
+It is useful to get a gross idea of how well (or not) an algorithm is doing, in the units 
+of the output variable.
+
+R2 spoken as R Squared (also called the coeﬃcient of determination) provides a goodness-of-ﬁt 
+measure for the predictions to the observations. This is a value between 0 and 1 for no-ﬁt 
+and perfect ﬁt respectively. In this example the longley economic dataset is used. 
+The output variable for this dataset is a number employed people in the population. It is 
+not clear whether this is an actual count (e.g. in millions) or a percentage.
+
+```{r}
+
+m <- m_input_data(longley) %>% m_response(~ Employed) %>% m_linear_regression() %>% m_cross_validation(number = 5) %>% m_rmse_metric() %>% m_train() %>% m_run()
+print(m$train)
+
+```
+
+## Area Under ROC Curve
+
+
+## Logarithmic Loss
+
+

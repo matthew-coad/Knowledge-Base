@@ -1,0 +1,158 @@
+---
+title: "Model Evaluation - Spotcheck"
+output: html_document
+---
+
+```{r}
+
+source("~/MCD/MCD/m.R")
+
+knitr::opts_chunk$set(fig.width = 16, fig.height = 12)
+options(width = 120)
+# g_startCluster()
+
+library(mlbench)
+data(PimaIndiansDiabetes)
+
+print("Loaded")
+
+```
+
+
+## Train multi model
+
+```{r}
+
+mm_pima <-
+    m_input_data(PimaIndiansDiabetes) %>%
+    m_response(~ diabetes) %>%
+    m_repeated_cross_validation(number = 10, repeats = 3) %>%
+    m_accuracy_metric() %>%
+    m_cross(
+        "algor",
+        cart = ~ m %>% m_classification_and_regression_trees(),
+        lda = ~ m %>% m_linear_discriminant_analysis(),
+        svm = ~ m %>% m_support_vector_machine_radial_basis_kernel(),
+        knn = ~ m %>% m_k_nearest_neighbors(),
+        rpart = ~ m %>% m_random_forest()
+    ) %>%
+    m_train() %>%
+    m_results() %>%
+    m_resamples() %>%
+    m_run()
+
+print("Trained")
+
+```
+
+## Evaluate multi model
+
+```{r}
+
+pima_resamples <- mm_pima %>% map("train") %>% caret::resamples()
+pima_resamples %>% summary()
+diff(pima_resamples) %>% summary()
+mm_pima %>% m_combine(data = ~resamples) %>% m_condition(~.task) %>% m_boxplot() %>% m_density() %>% m_run() %>% m_layout()
+
+```
+
+## Train transforms
+
+```{r}
+
+## PimaIndiansDiabetes %>% mutate_if(function(x) class(x) == "numeric", function(x) ifelse(x > 0, x, NA)) %>% m_get_variable_exploration()
+
+mm_pima_t <-
+    m_input_data(PimaIndiansDiabetes) %>%
+    m_response(~ diabetes) %>%
+    m_repeated_cross_validation(number = 10, repeats = 3) %>%
+    m_accuracy_metric() %>%
+    m_standardize_transform() %>%
+    m_cross(
+        lda = ~ m %>% m_linear_discriminant_analysis(),
+        svm = ~ m %>% m_support_vector_machine_radial_basis_kernel()
+    ) %>%
+    m_cross(
+        base = ~ m,
+        boxcox = ~ m %>% m_boxcox_transform(),
+        yeo = ~ m %>% m_yeojohnson_transform(),
+        pca = ~ m %>% m_pca_transform(),
+        box_pca = ~ m %>% m_boxcox_transform() %>% m_pca_transform()
+    ) %>%
+    m_train() %>%
+    m_results() %>%
+    m_resamples() %>%
+    m_run()
+
+print("Trained")
+
+```
+
+## Evaluate transforms
+
+```{r}
+
+mm_pima_t %>% map("train") %>% caret::resamples() %>% summary()
+mm_pima_t %>% m_combine(data = ~resamples) %>% m_condition(~.task) %>% m_boxplot() %>% m_density() %>% m_run() %>% m_layout()
+```
+
+## Evaluate cleaning
+
+```{r}
+
+mm_pima_cl <-
+    m_input_data(PimaIndiansDiabetes) %>%
+    m_response(~ diabetes) %>%
+    m_repeated_cross_validation(number = 10, repeats = 3) %>%
+    m_accuracy_metric() %>%
+    m_cross(
+        base = ~ m,
+        clean_knn = ~ m %>% m_mutate(~ mutate_all(data, function(x) ifelse(x > 0, x, NA))) %>% m_knn_impute()
+    ) %>%
+    m_cross(
+        cart = ~ m %>% m_classification_and_regression_trees(),
+        lda = ~m %>% m_linear_discriminant_analysis(),
+        svm = ~ m %>% m_support_vector_machine_radial_basis_kernel(),
+        knn = ~ m %>% m_k_nearest_neighbors(),
+        rpart = ~ m %>% m_random_forest()
+    ) %>%
+    m_train() %>%
+    m_results() %>%
+    m_resamples() %>%
+    m_run()
+
+print("Trained")
+
+```
+
+```{r}
+
+mm_pima_cl %>% map("train") %>% caret::resamples() %>% summary()
+mm_pima_cl %>% m_combine(data = ~resamples) %>% m_condition(~.task) %>% m_boxplot() %>% m_density() %>% m_run() %>% m_layout()
+
+```
+
+```{r}
+
+mm_pima_final <-
+    m_input_data(PimaIndiansDiabetes) %>%
+    m_response(~diabetes) %>%
+    m_repeated_cross_validation(number = 10, repeats = 3) %>%
+    m_accuracy_metric() %>%
+    m_mutate(~mutate_all(data, function(x) ifelse(x > 0, x, NA))) %>%
+    m_knn_impute() %>%
+    m_standardize_transform() %>%
+    m_boxcox_transform() %>%
+    m_pca_transform() %>%
+    m_linear_discriminant_analysis() %>%
+    m_train() %>%
+    m_resamples() %>%
+    m_run()
+
+print("Trained")
+
+mm_pima_final$resamples
+m_data(mm_pima_final$resamples) %>% m_density() %>% m_run() %>% m_layout()
+
+```
+

@@ -1,0 +1,16 @@
+---
+title: "Models - Overview"
+output: html_document
+---
+
+## Regression
+
+## Classification
+
+## Tree based
+
++ Are insensitive to characteristics of the data.
+
+## Outliers
+
+Support vector machines are insensitive for classification problems.
